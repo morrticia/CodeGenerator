@@ -44,9 +44,9 @@ string[] stringArray = new string[] {
 };
 
 
-app.MapGet("/GenerateCodes", (ICodeGenerator codeGen) =>
+app.MapPost("/GenerateCodes", (int count, ICodeGenerator codeGen) =>
     {
-        codeGen.AddBGJob(stringArray);
+        codeGen.AddCodeGenerationBGJobs(stringArray, count);
     })
     .WithName("GenerateCodes")
     .WithOpenApi();

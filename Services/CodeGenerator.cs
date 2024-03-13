@@ -15,29 +15,28 @@ public  class CodeGenerator : ICodeGenerator
         _logger = logger;
     }
 
-    public void AddBGJob(string[] stringArray)
+    public void AddCodeGenerationBGJobs(string[] stringArray, int count)
     {
         foreach (var prefix in stringArray)
         {
-            var jobId = _backgroundJobClient.Schedule(() => GenerateCodesAsync(prefix), new TimeSpan(0,0,0,1));
+            var jobId = _backgroundJobClient.Schedule(() => GenerateCodesAsync(prefix, count), new TimeSpan(0,0,0,1));
             _logger.LogInformation($"Job id: {jobId}");
         }
     }
 
-    public async Task GenerateCodesAsync(string prefix)
+    public async Task GenerateCodesAsync(string prefix, int count)
     {
         try
         {
             _logger.LogInformation($"Entered GenerateCodesAsync\nDate:{DateTime.Now}");
 
-            var guids = new HashSet<string>();
             var client = new MongoClient("mongodb://localhost:27017");
             var database = client.GetDatabase("test");
             var collection = database.GetCollection<Code>("Codes");
         
             _logger.LogInformation($"Started generating codes for {prefix}\nDate:{DateTime.Now}");
 
-            for (int i = 0; i < 500; i++)
+            for (int i = 0; i < count; i++)
             {
                 var guid = $"{prefix}-{Guid.NewGuid()}";
 
@@ -57,6 +56,6 @@ public  class CodeGenerator : ICodeGenerator
 
 public interface ICodeGenerator
 {
-    public void AddBGJob(string[] stringArray);
-    public Task GenerateCodesAsync(string prefix);
+    public void AddCodeGenerationBGJobs(string[] stringArray, int count);
+    public Task GenerateCodesAsync(string prefix, int count);
 }
